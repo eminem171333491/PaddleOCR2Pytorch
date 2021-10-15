@@ -4,8 +4,10 @@ from collections import OrderedDict
 import numpy as np
 import cv2
 import torch
+import json
 
 from pytorchocr.modeling.architectures.base_model import BaseModel
+
 
 class BaseOCRV20:
     def __init__(self, config, **kwargs):
@@ -25,7 +27,7 @@ class BaseOCRV20:
         with fluid.dygraph.guard():
             para_state_dict, opti_state_dict = fluid.load_dygraph(weights_path)
 
-        for k,v in self.net.state_dict().items():
+        for k, v in self.net.state_dict().items():
             name = k
 
             if name.endswith('num_batches_tracked'):
@@ -67,19 +69,18 @@ class BaseOCRV20:
         return out_channels
 
     def load_state_dict(self, weights):
-        self.net.load_state_dict(weights)
+        self.net.load_state_dict(weights, False)
         print('weighs is loaded.')
 
     def load_pytorch_weights(self, weights_path):
-        self.net.load_state_dict(torch.load(weights_path))
+        self.net.load_state_dict(torch.load(weights_path), False)
         print('model is loaded: {}'.format(weights_path))
 
 
-    def save_pytorch_weights(self, weights_path):
-        try:
-            torch.save(self.net.state_dict(), weights_path, _use_new_zipfile_serialization=False)
-        except:
-            torch.save(self.net.state_dict(), weights_path) # _use_new_zipfile_serialization=False for torch>=1.6.0
+    def save_pytorch_weights(self, weights_path, config):
+        state_dict = self.net.state_dict()
+        state_dict['Architecture'] = config
+        torch.save(state_dict, weights_path)
         print('model is saved: {}'.format(weights_path))
 
 
@@ -100,7 +101,7 @@ class BaseOCRV20:
             para_state_dict, opti_state_dict = fluid.load_dygraph(weights_path)
         print('paddle"')
         for k,v in para_state_dict.items():
-            print('{}----{}'.format(k,type(v)))
+            print('{}----{}'.format(k, type(v)))
 
 
     def inference(self, inputs):

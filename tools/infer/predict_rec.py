@@ -10,6 +10,7 @@ import numpy as np
 import math
 import time
 import torch
+import json
 from pytorchocr.base_ocr_v20 import BaseOCRV20
 import tools.infer.pytorchocr_utility as utility
 from pytorchocr.postprocess import build_post_process
@@ -52,9 +53,10 @@ class TextRecognizer(BaseOCRV20):
         self.limited_min_width = args.limited_min_width
 
         self.weights_path = args.rec_model_path
-        self.yaml_path = args.rec_yaml_path
-        network_config = utility.AnalysisConfig(self.weights_path, self.yaml_path)
+        # network_config = utility.AnalysisConfig(self.weights_path, self.yaml_path)
         weights = self.read_pytorch_weights(self.weights_path)
+        network_config = weights['Architecture']
+        weights.pop('Architecture')
         self.out_channels = self.get_out_channels(weights)
         # self.out_channels = self.get_out_channels_from_char_dict(args.rec_char_dict_path)
         kwargs['out_channels'] = self.out_channels

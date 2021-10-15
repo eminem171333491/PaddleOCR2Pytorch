@@ -66,7 +66,7 @@ def read_network_config_from_yaml(yaml_path):
     return res['Architecture']
 
 if __name__ == '__main__':
-    import argparse, json, textwrap, sys, os
+    import argparse, json, textwrap, sys, os, copy
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--yaml_path", type=str, help='Assign the yaml path of network configuration', default=None)
@@ -79,6 +79,7 @@ if __name__ == '__main__':
         if not os.path.exists(yaml_path):
             raise FileNotFoundError('{} is not existed.'.format(yaml_path))
         cfg = read_network_config_from_yaml(yaml_path)
+        architecture = copy.deepcopy(cfg)
     else:
         raise NotImplementedError
 
@@ -113,5 +114,5 @@ if __name__ == '__main__':
         save_name = args.dst_model_path
     else:
         save_name = '{}infer.pth'.format(os.path.basename(os.path.dirname(paddle_pretrained_model_path))[:-5])
-    converter.save_pytorch_weights(save_name)
+    converter.save_pytorch_weights(save_name, )
     print('done.')

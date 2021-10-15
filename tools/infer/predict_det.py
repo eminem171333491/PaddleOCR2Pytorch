@@ -84,8 +84,8 @@ class TextDetector(BaseOCRV20):
         self.use_gpu = torch.cuda.is_available() and use_gpu
 
         self.weights_path = args.det_model_path
-        self.yaml_path = args.det_yaml_path
-        network_config = utility.AnalysisConfig(self.weights_path, self.yaml_path)
+        weights = self.read_pytorch_weights(self.weights_path)
+        network_config = weights['Architecture']
         super(TextDetector, self).__init__(network_config, **kwargs)
 
         self.load_pytorch_weights(self.weights_path)

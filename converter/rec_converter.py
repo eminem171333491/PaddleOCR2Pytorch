@@ -7,6 +7,7 @@ import cv2
 import torch
 from pytorchocr.base_ocr_v20 import BaseOCRV20
 
+
 class RecV20RecConverter(BaseOCRV20):
     def __init__(self, config, paddle_pretrained_model_path, **kwargs):
         para_state_dict, opti_state_dict = self.read_paddle_weights(paddle_pretrained_model_path)
@@ -20,7 +21,7 @@ class RecV20RecConverter(BaseOCRV20):
 
     def load_paddle_weights(self, paddle_weights):
         para_state_dict, opti_state_dict = paddle_weights
-        for k,v in self.net.state_dict().items():
+        for k, v in self.net.state_dict().items():
             keyword = 'block_list.'
             if keyword in k:
                 # replace: block_list.
@@ -76,11 +77,13 @@ def read_network_config_from_yaml(yaml_path):
         res = yaml.safe_load(f)
     if res.get('Architecture') is None:
         raise ValueError('{} has no Architecture'.format(yaml_path))
-    return res['Architecture']
+    if res.get('Global') is None:
+        raise ValueError('{} has no Global'.format(yaml_path))
+    return res['Architecture'], res['Global']
 
 
 if __name__ == '__main__':
-    import argparse, json, textwrap, sys, os
+    import argparse, json, textwrap, sys, os, copy
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--yaml_path", type=str, help='Assign the yaml path of network configuration', default=None)
@@ -92,7 +95,20 @@ if __name__ == '__main__':
     if yaml_path is not None:
         if not os.path.exists(yaml_path):
             raise FileNotFoundError('{} is not existed.'.format(yaml_path))
-        cfg = read_network_config_from_yaml(yaml_path)
+        cfg, global_info = read_network_config_from_yaml(yaml_path)
+        architecture = copy.deepcopy(cfg)
+        character_dict_path = global_info['character_dict_path']
+        use_space_char = global_info['use_space_char']
+        character_str = ''
+        with open(character_dict_path, 'rb') as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.decode('utf-8').strip('\n').strip('\r\n')
+                character_str += line
+        if use_space_char:
+            character_str += ' '
+        dict_character = list(character_str)
+        classes = len(dict_character) + 1
     else:
         raise NotImplementedError
         # cfg = {'model_type':'rec',
@@ -104,9 +120,9 @@ if __name__ == '__main__':
         #        }
     kwargs = {}
     if 'att' in yaml_path:
-        kwargs['out_channels'] = 37 + 1
+        kwargs['out_channels'] = classes + 1
     else:
-        kwargs['out_channels'] = 37
+        kwargs['out_channels'] = classes
     paddle_pretrained_model_path = os.path.join(os.path.abspath(args.src_model_path), 'best_accuracy')
     converter = RecV20RecConverter(cfg, paddle_pretrained_model_path, **kwargs)
 
@@ -132,5 +148,5 @@ if __name__ == '__main__':
         save_name = args.dst_model_path
     else:
         save_name = '{}infer.pth'.format(os.path.basename(os.path.dirname(paddle_pretrained_model_path))[:-5])
-    converter.save_pytorch_weights(save_name)
+    converter.save_pytorch_weights(save_name, architecture)
     print('done.')
