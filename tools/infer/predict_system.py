@@ -10,10 +10,10 @@ import copy
 import numpy as np
 import time
 from PIL import Image
-import tools.infer.pytorchocr_utility as utility
-import tools.infer.predict_rec as predict_rec
-import tools.infer.predict_det as predict_det
-import tools.infer.predict_cls as predict_cls
+import pytorchocr_utility as utility
+import predict_rec
+import predict_det
+import predict_cls
 from pytorchocr.utils.utility import get_image_file_list, check_and_read_gif
 from tools.infer.pytorchocr_utility import draw_ocr_box_txt
 
