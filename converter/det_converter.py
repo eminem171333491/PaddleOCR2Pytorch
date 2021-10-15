@@ -6,6 +6,7 @@ import cv2
 import torch
 from pytorchocr.base_ocr_v20 import BaseOCRV20
 
+
 class DetV20DetConverter(BaseOCRV20):
     def __init__(self, config, paddle_pretrained_model_path, **kwargs):
         super(DetV20DetConverter, self).__init__(config, **kwargs)
@@ -65,8 +66,9 @@ def read_network_config_from_yaml(yaml_path):
         raise ValueError('{} has no Architecture'.format(yaml_path))
     return res['Architecture']
 
+
 if __name__ == '__main__':
-    import argparse, json, textwrap, sys, os, copy
+    import argparse, sys, os, copy
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--yaml_path", type=str, help='Assign the yaml path of network configuration', default=None)
@@ -114,5 +116,5 @@ if __name__ == '__main__':
         save_name = args.dst_model_path
     else:
         save_name = '{}infer.pth'.format(os.path.basename(os.path.dirname(paddle_pretrained_model_path))[:-5])
-    converter.save_pytorch_weights(save_name, )
+    converter.save_pytorch_weights(save_name, architecture)
     print('done.')
