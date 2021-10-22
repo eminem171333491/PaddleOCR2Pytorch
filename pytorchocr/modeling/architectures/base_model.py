@@ -82,5 +82,5 @@ class BaseModel(nn.Module):
         x = self.backbone(x)
         if self.use_neck:
             x = self.neck(x)
-        x = self.head(x)
-        return x
+        output = self.head(x)
+        return output

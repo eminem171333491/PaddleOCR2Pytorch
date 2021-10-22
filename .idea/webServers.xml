@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="3d9ca8bb-c9af-4a22-b41b-7c58f8bfa747" name="paddle2torch">
+        <fileTransfer rootFolder="/data/huangchengjie" accessType="SFTP" host="10.1.1.180" port="22" sshConfigId="9a8cf0af-e9b8-4d60-9d1c-d84bc1c5ed75" sshConfig="huangchengjie@10.1.1.180:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
